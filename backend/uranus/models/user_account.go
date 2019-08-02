@@ -12,7 +12,7 @@ type UserAccount struct {
 	ID           bson.ObjectId `json:"id,omitempty" bson:"_id,omitempty"`
 	FirstName    string        `json:"first_name" bson:"first_name" validate:"required"`
 	LastName     string        `json:"last_name" bson:"last_name" validate:"required"`
-	EmailAddress string        `json:"email_addres" bson:"email_address" validaet:"required"`
+	EmailAddress string        `json:"email_address" bson:"email_address" validaet:"required"`
 	Role         UserRole      `json:"role" bson:"role" validate:"required"`
 	IsBanned     bool          `json:"is_banned" bson:"is_banned"`
 	Password     string        `json:"password,omitempty" bson:"password,omitempty"`

@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/fidellr/jastip_way/backend/uranus/models"
+	"github.com/labstack/echo"
 
 	"github.com/fidellr/jastip_way/backend/uranus"
-	"github.com/labstack/echo"
+	"github.com/fidellr/jastip_way/backend/uranus/models"
 )
 
 type userHandler struct {
@@ -126,6 +126,6 @@ func NewUserHandler(e *echo.Echo, reqs ...userRequirements) {
 	e.POST("/user/create", handler.CreateAccount)
 	e.GET("/user", handler.Fetch)
 	e.GET("/user/:id", handler.GetUserByUUID)
-	e.POST("/user/:id", handler.SuspendAccount)
-	e.GET("/user/:id", handler.RemoveAccount)
+	e.POST("/user/suspend/:id", handler.SuspendAccount)
+	e.DELETE("/user/:id", handler.RemoveAccount)
 }
