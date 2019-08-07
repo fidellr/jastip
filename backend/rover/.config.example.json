@@ -1,0 +1,21 @@
+{
+  "debug": true,
+  "server": {
+    "address": ":7724"
+  },
+  "context": {
+    "timeout": 5
+  },
+  "mongo": {
+    "dsn": "mongodb://127.0.0.1:27017",
+    "database": "rover"
+  },
+  "http": {
+    "max_idle_conns": 100,
+    "max_idle_conns_per_host": 100,
+    "keep_alive_timeout": 120,
+    "timeout": 5,
+    "server_read_timeout": 15,
+    "server_write_timeout": 15
+  }
+}

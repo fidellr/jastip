@@ -1,26 +1,23 @@
-package uranus
+package rover
 
 import (
 	"context"
 	"encoding/base64"
 	"time"
 
+	"github.com/fidellr/jastip_way/backend/rover/models"
 	"github.com/globalsign/mgo/bson"
-
-	"github.com/fidellr/jastip_way/backend/uranus/models"
 )
 
 var (
 	timeFormat = "2006-01-02T15:04:05.999Z07:00"
 )
 
-type UserAccountUsecase interface {
-	CreateUserAccount(ctx context.Context, userAccountM *models.UserAccount) error
-	Fetch(ctx context.Context, filter *Filter) ([]*models.UserAccount, string, error)
-	GetUserByID(ctx context.Context, uuid string) (*models.UserAccount, error)
-	SuspendAccount(ctx context.Context, uuid string) (bool, error)
-	RemoveAccount(ctx context.Context, uuid string) (bool, error)
-	UpdateUserByID(ctx context.Context, uuid string, userAccountM *models.UserAccount) error
+type ContentUsecase interface {
+	CreateScreenContent(ctx context.Context, m *models.Content) error
+	FetchContent(ctx context.Context, filter *Filter) ([]*models.Content, string, error)
+	UpdateByContentID(ctx context.Context, screenID string, m *models.Content) error
+	GetContentByScreen(ctx context.Context, screenName string) (*models.Content, error)
 }
 
 type Filter struct {

@@ -30,8 +30,6 @@ func (s *service) CreateUserAccount(ctx context.Context, m *models.UserAccount) 
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
 
-	// Validate struct
-
 	if err != nil {
 		err = errors.Wrap(err, "error validating user account")
 		return err
@@ -69,7 +67,7 @@ func (s *service) Fetch(ctx context.Context, filter *uranus.Filter) ([]*models.U
 	return users, nextCursor, nil
 }
 
-func (s *service) GetUserByUUID(ctx context.Context, uuid string) (*models.UserAccount, error) {
+func (s *service) GetUserByID(ctx context.Context, id string) (*models.UserAccount, error) {
 	if ctx == nil {
 		err := uranus.ErrContextNil
 		return nil, err
@@ -78,7 +76,7 @@ func (s *service) GetUserByUUID(ctx context.Context, uuid string) (*models.UserA
 	ctx, cancel := context.WithTimeout(ctx, s.contextTimeout)
 	defer cancel()
 
-	user, err := s.repository.GetUserByUUID(ctx, uuid)
+	user, err := s.repository.GetUserByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +84,7 @@ func (s *service) GetUserByUUID(ctx context.Context, uuid string) (*models.UserA
 	return user, nil
 }
 
-func (s *service) SuspendAccount(ctx context.Context, uuid string) (bool, error) {
+func (s *service) SuspendAccount(ctx context.Context, id string) (bool, error) {
 	if ctx == nil {
 		err := uranus.ErrContextNil
 		return false, err
@@ -95,7 +93,7 @@ func (s *service) SuspendAccount(ctx context.Context, uuid string) (bool, error)
 	ctx, cancel := context.WithTimeout(ctx, s.contextTimeout)
 	defer cancel()
 
-	isSuspsended, err := s.repository.SuspendAccount(ctx, uuid)
+	isSuspsended, err := s.repository.SuspendAccount(ctx, id)
 	if !isSuspsended || err != nil {
 		return false, err
 	}
@@ -103,7 +101,7 @@ func (s *service) SuspendAccount(ctx context.Context, uuid string) (bool, error)
 	return true, nil
 }
 
-func (s *service) RemoveAccount(ctx context.Context, uuid string) (bool, error) {
+func (s *service) RemoveAccount(ctx context.Context, id string) (bool, error) {
 	if ctx == nil {
 		err := uranus.ErrContextNil
 		return false, err
@@ -112,12 +110,31 @@ func (s *service) RemoveAccount(ctx context.Context, uuid string) (bool, error) 
 	ctx, cancel := context.WithTimeout(ctx, s.contextTimeout)
 	defer cancel()
 
-	isRemoved, err := s.repository.RemoveAccount(ctx, uuid)
+	isRemoved, err := s.repository.RemoveAccount(ctx, id)
 	if !isRemoved || err != nil {
 		return false, err
 	}
 
 	return true, nil
+}
+
+func (s *service) UpdateUserByID(ctx context.Context, id string, m *models.UserAccount) (err error) {
+	if ctx == nil {
+		err = uranus.ErrContextNil
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, s.contextTimeout)
+	defer cancel()
+
+	m.UpdatedAt = time.Now()
+
+	err = s.repository.UpdateUserByID(ctx, id, m)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type requirement func(*service)

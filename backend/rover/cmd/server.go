@@ -6,22 +6,22 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fidellr/jastip_way/backend/uranus"
-	"github.com/fidellr/jastip_way/backend/uranus/internal/delivery"
-	_httpDelivery "github.com/fidellr/jastip_way/backend/uranus/internal/delivery/http"
-	_mongoRepository "github.com/fidellr/jastip_way/backend/uranus/internal/delivery/repository/mongo"
-
-	"github.com/fidellr/jastip_way/backend/uranus/user"
 	"github.com/globalsign/mgo"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/fidellr/jastip_way/backend/rover"
+	"github.com/fidellr/jastip_way/backend/rover/content"
+	delivery "github.com/fidellr/jastip_way/backend/rover/internal/delivery"
+	_httpDelivery "github.com/fidellr/jastip_way/backend/rover/internal/delivery/http"
+	_mongoRepository "github.com/fidellr/jastip_way/backend/rover/internal/delivery/mongo"
 )
 
-var uranusServerCMD = &cobra.Command{
+var roverServerCMD = &cobra.Command{
 	Use:   "http",
-	Short: "Start http server for uranus",
+	Short: "Start http server for rover",
 	Run: func(cmd *cobra.Command, args []string) {
 		logrus.SetFormatter(&logrus.TextFormatter{
 			FullTimestamp: true,
@@ -32,10 +32,10 @@ var uranusServerCMD = &cobra.Command{
 		echoInstance.Server.WriteTimeout = time.Duration(viper.GetInt("http.server_write_timeout")) * time.Second
 
 		echoInstance.GET("/ping", func(c echo.Context) error {
-			return c.String(http.StatusOK, "pong user")
+			return c.String(http.StatusOK, "pong content")
 		})
 
-		initUranusApplication(echoInstance)
+		initRoverApplication(echoInstance)
 
 		address := viper.GetString("server.address")
 		if err := echoInstance.Start(address); err != nil {
@@ -48,8 +48,8 @@ var uranusServerCMD = &cobra.Command{
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	RootCMD.AddCommand(uranusServerCMD)
-	uranusServerCMD.PersistentFlags().String("config", "", "Set this flag to use a configuration file")
+	RootCMD.AddCommand(roverServerCMD)
+	roverServerCMD.PersistentFlags().String("config", "", "Set this flag to use a configuration file")
 }
 
 func initConfig() {
@@ -59,9 +59,9 @@ func initConfig() {
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)
 
-	if uranusServerCMD.Flags().Lookup("config") != nil {
+	if roverServerCMD.Flags().Lookup("config") != nil {
 		configFile = "config.json"
-		viper.BindPFlag("config", uranusServerCMD.Flags().Lookup("config"))
+		viper.BindPFlag("config", roverServerCMD.Flags().Lookup("config"))
 		viper.SetConfigType("json")
 	}
 
@@ -76,24 +76,13 @@ func initConfig() {
 
 	if viper.GetBool("debug") {
 		logrus.SetLevel(logrus.DebugLevel)
-		logrus.Warn("Uranus is Running in Debug Mode")
-		return
+		logrus.Warn("Rover is Running in Debug Mode")
 	}
-	logrus.SetLevel(logrus.InfoLevel)
-	logrus.Warn("Uranus is Running in Production Mode")
 }
 
-func initUranusApplication(e *echo.Echo) {
-	// timeout := time.Duration(viper.GetInt("http.timeout")) * time.Second
+func initRoverApplication(e *echo.Echo) {
 	contextTimeout := time.Duration(viper.GetInt("context.timeout")) * time.Second
-	// defaultTransport := &http.Transport{
-	// 	MaxIdleConns:        viper.GetInt("http.max_idle_conns"),
-	// 	MaxIdleConnsPerHost: viper.GetInt("http.max_idle_conns_per_host"),
-	// 	IdleConnTimeout:     time.Duration(viper.GetInt("http.max_idle_conn_timeout")) * time.Second,
-	// }
-
 	mongoDSN := viper.GetString("mongo.dsn")
-
 	masterSession, err := mgo.Dial(mongoDSN)
 	if err != nil {
 		logrus.Fatalln(err.Error())
@@ -106,17 +95,16 @@ func initUranusApplication(e *echo.Echo) {
 		logrus.Fatalln(errors.New("Please provide a mongo database name"))
 	}
 
-	validator := uranus.NewValidator()
-	userRepo := _mongoRepository.NewUserMongo(
-		_mongoRepository.UserSession(masterSession),
-		_mongoRepository.UserDBName(mongoDatabase),
+	validator := rover.NewValidator()
+	contentRepo := _mongoRepository.NewContentMongo(
+		_mongoRepository.ContentSession(masterSession),
+		_mongoRepository.ContentDBName(mongoDatabase),
 	)
-	uranusService := user.NewService(
-		user.Repository(userRepo),
-		user.Timeout(contextTimeout),
-		user.Validator(validator),
+	roverService := content.NewService(
+		content.Repository(contentRepo),
+		content.Timeout(contextTimeout),
+		content.Validator(validator),
 	)
-
 	e.HTTPErrorHandler = delivery.HandleUncaughtHTTPError
-	_httpDelivery.NewUserHandler(e, _httpDelivery.UserService(uranusService))
+	_httpDelivery.NewContentHandler(e, _httpDelivery.ContentService(roverService))
 }

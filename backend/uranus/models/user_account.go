@@ -17,6 +17,7 @@ type UserAccount struct {
 	IsBanned     bool          `json:"is_banned" bson:"is_banned"`
 	Password     string        `json:"password,omitempty" bson:"password,omitempty"`
 	Needs        string        `json:"needs" bson:"needs"`
+	AddOn        interface{}   `json:"addon" bson:"addon"`
 }
 
 type UserRole struct {

@@ -63,24 +63,28 @@ func (u *userMongoRepository) Fetch(ctx context.Context, filter *uranus.Filter) 
 	defer session.Close()
 
 	var m []*models.UserAccount
-	var query bson.M
+	query := make(bson.M)
 	if filter.Cursor != "" {
 		createdAt, err := uranus.DecodeTime(filter.Cursor)
-		if err != nil {
+		if err == nil {
 			query["created_at"] = bson.M{"$lt": createdAt}
 		} else {
 			log.Fatalf("Failed to pass cursor %s : %s \n", filter.Cursor, err.Error())
 		}
 	}
 
-	err := session.DB(u.DBName).C(userAccountCollectionName).Find(bson.M{}).Limit(filter.Num).Sort("-created_at").All(&m)
+	if filter.RoleName != "" {
+		query["role"] = bson.M{"role_name": filter.RoleName}
+	}
+
+	err := session.DB(u.DBName).C(userAccountCollectionName).Find(query).Limit(filter.Num).Sort("-created_at").All(&m)
 	if err != nil {
 		log.Println(err.Error())
-		return nil, "", err
+		return make([]*models.UserAccount, 0), "", err
 	}
 
 	if len(m) == 0 {
-		return m, "", err
+		return make([]*models.UserAccount, 0), "", err
 	}
 
 	lastUsers := m[len(m)-1]
@@ -88,7 +92,7 @@ func (u *userMongoRepository) Fetch(ctx context.Context, filter *uranus.Filter) 
 	return m, nextCursors, nil
 }
 
-func (u *userMongoRepository) GetUserByUUID(ctx context.Context, uuid string) (*models.UserAccount, error) {
+func (u *userMongoRepository) GetUserByID(ctx context.Context, uuid string) (*models.UserAccount, error) {
 	session := u.Session.Clone()
 	defer session.Close()
 
@@ -138,4 +142,18 @@ func (u *userMongoRepository) RemoveAccount(ctx context.Context, uuid string) (b
 	}
 
 	return true, nil
+}
+
+func (u *userMongoRepository) UpdateUserByID(ctx context.Context, uuid string, m *models.UserAccount) error {
+	session := u.Session.Clone()
+	defer session.Close()
+
+	uuidB := bson.ObjectIdHex(uuid)
+	err := session.DB(u.DBName).C(userAccountCollectionName).Update(bson.M{"_id": uuidB}, m)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	return nil
 }

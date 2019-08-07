@@ -50,8 +50,9 @@ func (h *userHandler) Fetch(c echo.Context) error {
 	}
 
 	filter := uranus.Filter{
-		Cursor: c.QueryParam("cursor"),
-		Num:    num,
+		Cursor:   c.QueryParam("cursor"),
+		Num:      num,
+		RoleName: c.QueryParam("role"),
 	}
 
 	users, nextCursors, err := h.service.Fetch(ctx, &filter)
@@ -63,14 +64,14 @@ func (h *userHandler) Fetch(c echo.Context) error {
 	return c.JSON(http.StatusOK, users)
 }
 
-func (h *userHandler) GetUserByUUID(c echo.Context) error {
+func (h *userHandler) GetUserByID(c echo.Context) error {
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	uuid := c.Param("id")
-	user, err := h.service.GetUserByUUID(ctx, uuid)
+	id := c.Param("id")
+	user, err := h.service.GetUserByID(ctx, id)
 	if err != nil {
 		return uranus.ConstraintErrorf("%s", err.Error())
 	}
@@ -108,6 +109,26 @@ func (h *userHandler) RemoveAccount(c echo.Context) error {
 	return c.JSON(http.StatusOK, isDeleted)
 }
 
+func (h *userHandler) UpdateUserByID(c echo.Context) (err error) {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	id := c.Param("id")
+	u := new(models.UserAccount)
+	if err = c.Bind(u); err != nil {
+		return uranus.ConstraintErrorf("%s", err.Error())
+	}
+
+	err = h.service.UpdateUserByID(ctx, id, u)
+	if err != nil {
+		return uranus.ConstraintErrorf("%s", err.Error())
+	}
+
+	return c.JSON(http.StatusOK, true)
+}
+
 type userRequirements func(d *userHandler)
 
 func UserService(service uranus.UserAccountUsecase) userRequirements {
@@ -125,7 +146,8 @@ func NewUserHandler(e *echo.Echo, reqs ...userRequirements) {
 
 	e.POST("/user/create", handler.CreateAccount)
 	e.GET("/user", handler.Fetch)
-	e.GET("/user/:id", handler.GetUserByUUID)
+	e.GET("/user/:id", handler.GetUserByID)
 	e.POST("/user/suspend/:id", handler.SuspendAccount)
 	e.DELETE("/user/:id", handler.RemoveAccount)
+	e.PUT("/user/:id", handler.UpdateUserByID)
 }
