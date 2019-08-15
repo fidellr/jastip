@@ -67,7 +67,7 @@ func (r *imageMongoRepository) FetchImages(ctx context.Context, filter *plateu.F
 		if err == nil {
 			query["cursor"] = bson.M{"$lt": createdAt}
 		} else {
-			log.Fatalf("Failed to pass cursor %s : %s \n", filter.Cursor, err.Error())
+			log.Printf("Failed to pass cursor %s : %s \n", filter.Cursor, err.Error())
 		}
 	}
 
@@ -78,7 +78,7 @@ func (r *imageMongoRepository) FetchImages(ctx context.Context, filter *plateu.F
 	var m []*models.Image
 	err := session.DB(r.DBName).C(imageCollectionName).Find(query).All(&m)
 	if err != nil {
-		log.Fatalf("Failed to fetch screen content : %s \n", err.Error())
+		log.Printf("Failed to fetch screen content : %s \n", err.Error())
 		return nil, "", err
 	}
 
@@ -98,21 +98,34 @@ func (r *imageMongoRepository) GetImageByID(ctx context.Context, imageID string)
 	var m *models.Image
 	imageIDb := bson.ObjectIdHex(imageID)
 	if err := session.DB(r.DBName).C(imageCollectionName).Find(bson.M{"_id": imageIDb}).One(&m); err != nil {
-		log.Fatalf("Failed to get image : %s", err.Error())
+		log.Printf("Failed to get image : %s", err.Error())
 		return nil, err
 	}
 
 	return m, nil
 }
 
-func (r *imageMongoRepository) UpdateImageByID(ctx context.Context, imageId string, image *models.Image) (err error) {
+func (r *imageMongoRepository) UpdateImageByID(ctx context.Context, imageID string, image *models.Image) (err error) {
 	session := r.Session.Clone()
 	defer session.Close()
 
-	imageIDb := bson.ObjectIdHex(imageId)
+	imageIDb := bson.ObjectIdHex(imageID)
 	err = session.DB(r.DBName).C(imageCollectionName).Update(bson.M{"_id": imageIDb}, image)
 	if err != nil {
-		log.Fatalf("Failed to update image : %s", err.Error())
+		log.Printf("Failed to update image : %s", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (r *imageMongoRepository) RemoveImageByID(ctx context.Context, imageID string) (err error) {
+	session := r.Session.Clone()
+	defer session.Close()
+
+	imageIDb := bson.ObjectIdHex(imageID)
+	if err = session.DB(r.DBName).C(imageCollectionName).Remove(bson.M{"_id": imageIDb}); err != nil {
+		log.Printf("Failed to remoove image : %s", err.Error())
 		return err
 	}
 

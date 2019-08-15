@@ -201,12 +201,10 @@ func (s *service) UpdateImageByID(ctx context.Context, imageID string, m *models
 	ctx, cancel := context.WithTimeout(ctx, s.contextTimeout)
 	defer cancel()
 
-	// var fb *FBProfileData
 	done := make(chan bool)
 	go func() {
-		// fb, err = Parse(ctx, m.URL)
 		if err != nil {
-			log.Fatalf("Failed to parse docs : %s", err.Error())
+			log.Printf("Failed to parse docs : %s", err.Error())
 			done <- true
 			return
 		}
@@ -216,11 +214,26 @@ func (s *service) UpdateImageByID(ctx context.Context, imageID string, m *models
 	}()
 
 	if <-done {
-		// m.URL = fb.ImageURL
 		err = s.repository.UpdateImageByID(ctx, imageID, m)
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (s *service) RemoveImageByID(ctx context.Context, imageID string) (err error) {
+	if ctx == nil {
+		err = plateu.ErrContextNil
+		return err
+	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	if err = s.repository.RemoveImageByID(ctx, imageID); err != nil {
+		return err
 	}
 
 	return nil

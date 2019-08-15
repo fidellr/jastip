@@ -18,8 +18,8 @@ import (
 func UploadFile(c echo.Context, data interface{}, needs string) (err error) {
 	var dst *os.File
 	var src multipart.File
-	var file *multipart.FileHeader
 	var fileLink string
+	file := new(multipart.FileHeader)
 
 	switch needs {
 	case "profile_picture":
@@ -57,7 +57,7 @@ func UploadFile(c echo.Context, data interface{}, needs string) (err error) {
 
 	// Copy old original source file to created file as the destination
 	if _, err := io.Copy(dst, src); err != nil {
-		log.Fatalf("Failed to copy file : %s", err.Error())
+		log.Printf("Failed to copy file : %s", err.Error())
 		return err
 	}
 

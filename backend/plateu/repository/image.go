@@ -12,4 +12,5 @@ type ImageRepository interface {
 	FetchImages(ctx context.Context, filter *plateu.Filter) ([]*models.Image, string, error)
 	GetImageByID(ctx context.Context, imageID string) (*models.Image, error)
 	UpdateImageByID(ctx context.Context, imageID string, m *models.Image) error
+	RemoveImageByID(ctx context.Context, imageID string) error
 }

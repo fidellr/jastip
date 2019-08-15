@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
+
+	"github.com/fidellr/jastip_way/backend/plateu/utils"
 
 	"github.com/fidellr/jastip_way/backend/plateu"
 	"github.com/fidellr/jastip_way/backend/plateu/models"
@@ -30,6 +33,7 @@ func NewImageHandler(e *echo.Echo, reqs ...imageRequirements) {
 	e.GET("/images", handler.FetchImages)
 	e.GET("/image/:id", handler.GetImageByID)
 	e.PUT("/image/:id", handler.UpdateImageByID)
+	e.DELETE("/image/:id", handler.RemoveImageByID)
 }
 
 func ImageService(service plateu.ImageUsecase) imageRequirements {
@@ -127,12 +131,36 @@ func (h *imageHandler) GetImageByID(c echo.Context) (err error) {
 		return plateu.ConstraintErrorf("%s", err.Error())
 	}
 
-	image, err := h.service.GetImageByID(ctx, imgID)
+	img, err := h.service.GetImageByID(ctx, imgID)
 	if err != nil {
-		return plateu.ConstraintErrorf("Failed to get image with id %s : %s", imgID, err.Error())
+		return plateu.ConstraintErrorf("Failed to get img with id %s : %s", imgID, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, image)
+	rawFile, err := os.Open(fmt.Sprintf("../saved_data/profile_data/pictures/%s-%s.tar.gz", img.FileLink, img.Needs))
+	if err != nil {
+		return plateu.ConstraintErrorf("Failed to open existing data : %s", err.Error())
+	}
+	defer rawFile.Close()
+
+	err = utils.DecompressFile(rawFile)
+	if err != nil {
+		return plateu.ConstraintErrorf("Failed to decompress file : %s", err.Error())
+	}
+
+	newFileName := fmt.Sprintf("../saved_data/profile_data/pictures/%s-%s.jpg", img.FileLink, img.Needs)
+
+	defer func() {
+		if err = os.Remove(newFileName); err != nil {
+			log.Printf("Failed to remove file : %s", err.Error())
+			return
+		}
+	}()
+
+	if err = c.File(newFileName); err != nil {
+		return plateu.ConstraintErrorf("Failed to send file : %s", err.Error())
+	}
+
+	return c.File(newFileName)
 }
 
 func (h *imageHandler) UpdateImageByID(c echo.Context) (err error) {
@@ -157,4 +185,22 @@ func (h *imageHandler) UpdateImageByID(c echo.Context) (err error) {
 	}
 
 	return c.JSON(http.StatusOK, true)
+}
+
+func (h *imageHandler) RemoveImageByID(c echo.Context) (err error) {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	imgID := c.Param("id")
+	if imgID == "" {
+		return plateu.ConstraintErrorf("Failed to get image id param : %s", err.Error())
+	}
+
+	if err = h.service.RemoveImageByID(ctx, imgID); err != nil {
+		return plateu.ConstraintErrorf("Failed to remove image by id %s : %s", imgID, err.Error())
+	}
+
+	return c.NoContent(http.StatusOK)
 }

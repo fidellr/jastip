@@ -18,6 +18,7 @@ type ImageUsecase interface {
 	FetchImages(ctx context.Context, filter *Filter) ([]*models.Image, string, error)
 	GetImageByID(ctx context.Context, imageID string) (*models.Image, error)
 	UpdateImageByID(ctx context.Context, imageID string, m *models.Image) error
+	RemoveImageByID(ctx context.Context, imageID string) error
 }
 
 type Filter struct {

@@ -1,14 +1,14 @@
 package utils
 
 import (
-	"bufio"
-	"bytes"
-	"compress/gzip"
+	"archive/tar"
+	"compress/zlib"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/fidellr/jastip_way/backend/plateu/models"
 
@@ -25,8 +25,8 @@ func HandleUncaughtHTTPError(err error, c echo.Context) {
 	c.JSON(http.StatusInternalServerError, ErrorHTTPResponse{Message: err.Error()})
 }
 
-// Exists : returns whether the given file or directory exists
-func Exists(path string) (bool, error) {
+// isDirExists : returns whether the given file or directory exists
+func isDirExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
 		return true, nil
@@ -44,18 +44,18 @@ func CompressFile(data interface{}, needs string) (err error) {
 	switch needs {
 	case "profile_picture":
 		img := data.(*models.Image)
-		gzipOldFileName = fmt.Sprintf("%s-%s.gzip", img.FileLink, img.Needs)
+		gzipOldFileName = fmt.Sprintf("%s-%s.tar.gz", img.FileLink, img.Needs)
 		fileName = fmt.Sprintf("%s-%s.jpg", img.FileLink, needs)
 
-		isExists, err := Exists("../saved_data/profile_data")
+		isExists, err := isDirExists("../saved_data/profile_data")
 		if !isExists {
 			if err != nil {
-				return fmt.Errorf("Failed to check folder, folder is not exists")
-			}
+				err = os.MkdirAll("../saved_data/profile_data/pictures", 0755)
+				if err != nil {
+					return fmt.Errorf("Failed to create folder for profile picture : %s", err.Error())
+				}
 
-			err = os.MkdirAll("../saved_data/profile_data/pictures", 0755)
-			if err != nil {
-				return fmt.Errorf("Failed to create folder for profile picture")
+				return fmt.Errorf("Failed to check folder, folder is not exists : %s", err.Error())
 			}
 		}
 
@@ -73,61 +73,107 @@ func CompressFile(data interface{}, needs string) (err error) {
 
 	info, _ := rawFile.Stat()
 	size := info.Size()
-	rawBytes := make([]byte, size)
-	fmt.Printf("File uploaded successfuly with file name : %s and with size %d\n", fileName, size)
+	fmt.Printf("File uploaded successfully with file name : %s and with size %d\n", fileName, size)
 
-	buffer := bufio.NewReader(rawFile)
-	_, err = buffer.Read(rawBytes)
+	writer, err := os.Create(gzipNewFileName)
 	if err != nil {
-		return fmt.Errorf("Failed to read rawBytes : %s", err.Error())
+		return fmt.Errorf("Failed to create new file : %s", err.Error())
 	}
+	defer writer.Close()
 
-	var buf bytes.Buffer
-	gw, err := gzip.NewWriterLevel(&buf, gzip.BestSpeed)
+	gw, err := zlib.NewWriterLevel(writer, zlib.BestSpeed)
 	if err != nil {
 		return fmt.Errorf("Failed to initialize gzip with level: %s", err.Error())
 	}
-
-	if _, err := gw.Write(rawBytes); err != nil {
-		return fmt.Errorf("Failed gzip file : %s", err.Error())
-	}
-
-	if err = gw.Flush(); err != nil {
-		return fmt.Errorf("Failed to flush pending compressed data : %s", err.Error())
-	}
 	defer gw.Close()
 
-	err = ioutil.WriteFile(gzipOldFileName, buf.Bytes(), info.Mode())
+	tw := tar.NewWriter(gw)
+	defer tw.Close()
+
+	header, err := tar.FileInfoHeader(info, info.Name())
 	if err != nil {
-		return fmt.Errorf("Failed to write file : %s", err.Error())
+		return err
 	}
 
-	err = os.Rename(gzipOldFileName, gzipNewFileName)
+	header.Name = gzipNewFileName
+	if err = tw.WriteHeader(header); err != nil {
+		return fmt.Errorf("Failed to write header : %s", err.Error())
+	}
+
+	if !info.Mode().IsRegular() {
+		return nil
+	}
+
+	fh, err := os.Open(fileName)
 	if err != nil {
-		return fmt.Errorf("Failed to rename file : %s", err.Error())
+		return err
+	}
+	defer fh.Close()
+
+	if _, err := io.Copy(tw, rawFile); err != nil {
+		return fmt.Errorf("Failed to copy file data : %s", err.Error())
 	}
 
-	gzipSize, err := buf.Read(buf.Bytes())
-	fmt.Printf("Gzip File uploaded successfuly with the old file name %s and new file name %s with %d size\n", gzipOldFileName, gzipNewFileName, gzipSize)
-
-	if err = os.Remove(fileName); err != nil {
-		return fmt.Errorf("Failed to remove image file : %s", err.Error())
-	}
-
+	defer os.Remove(fileName)
 	return nil
 }
 
-func DecompressFile(w io.Writer, data []byte) ([]byte, error) {
-	gr, err := gzip.NewReader(bytes.NewBuffer(data))
-	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize gzip reader : %s", err.Error())
-	}
-	defer gr.Close()
-
-	data, err = ioutil.ReadAll(gr)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to readAll reader : %s", err.Error())
+func DecompressFile(file *os.File) (err error) {
+	var fileReader io.ReadCloser = file
+	if strings.HasSuffix(file.Name(), ".gz") {
+		if fileReader, err = zlib.NewReader(file); err != nil {
+			log.Printf("Failed to initialize zlib reader : %s", err.Error())
+			return err
+		}
+		defer fileReader.Close()
 	}
 
-	return data, nil
+	tarReader := tar.NewReader(fileReader)
+
+	for {
+		header, err := tarReader.Next()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			log.Printf("Failed to reading next entry in the tar file : %s", err.Error())
+			break
+		}
+
+		fullpath := header.Name
+		filename := strings.Split(fullpath, "/")[4]
+		name := strings.TrimSuffix(filename, ".tar.gz")
+		untarredFilePath := fmt.Sprintf("../saved_data/profile_data/pictures/%s.jpg", name)
+
+		switch header.Typeflag {
+		case tar.TypeDir:
+			if err = os.MkdirAll(fullpath, os.FileMode(header.Mode)); err != nil {
+				log.Printf("typeDirMkdirAll err : %s", err.Error())
+				return err
+			}
+		case tar.TypeReg:
+			writer, err := os.Create(untarredFilePath)
+			if err != nil {
+				log.Printf("Failed to create image file for output : %s", err.Error())
+				return err
+			}
+
+			if _, err = io.Copy(writer, tarReader); err != nil {
+				log.Printf("Failed to copy tarred file to writer: %s", err.Error())
+				return err
+			}
+
+			if err = os.Chmod(untarredFilePath, os.FileMode(header.Mode)); err != nil {
+				log.Printf("Failed to change the mode of the named file : %s", err.Error())
+				return err
+			}
+
+			writer.Close()
+		default:
+			fmt.Printf("Unable to untar type : %c in file %s", header.Typeflag, fullpath)
+		}
+	}
+
+	return nil
 }
