@@ -1,4 +1,4 @@
 # Rover
-Rover is a main service that handle for each jatip way content screens
+Rover is a main service that handle content screens
 
 ## How to use
