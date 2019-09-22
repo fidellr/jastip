@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/fidellr/jastip_way/backend/rover/models"
+	"github.com/fidellr/jastip/backend/rover/models"
 
-	"github.com/fidellr/jastip_way/backend/rover"
+	"github.com/fidellr/jastip/backend/rover"
 	"github.com/labstack/echo"
 )
 

@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/fidellr/jastip_way/backend/plateu/utils"
+	"github.com/fidellr/jastip/backend/plateu/utils"
 
-	"github.com/fidellr/jastip_way/backend/plateu"
-	"github.com/fidellr/jastip_way/backend/plateu/models"
+	"github.com/fidellr/jastip/backend/plateu"
+	"github.com/fidellr/jastip/backend/plateu/models"
 	"github.com/labstack/echo"
 )
 

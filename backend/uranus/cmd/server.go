@@ -6,12 +6,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fidellr/jastip_way/backend/uranus"
-	"github.com/fidellr/jastip_way/backend/uranus/internal/delivery"
-	_httpDelivery "github.com/fidellr/jastip_way/backend/uranus/internal/delivery/http"
-	_mongoRepository "github.com/fidellr/jastip_way/backend/uranus/internal/delivery/repository/mongo"
+	"github.com/fidellr/jastip/backend/uranus"
+	"github.com/fidellr/jastip/backend/uranus/internal/delivery"
+	_httpDelivery "github.com/fidellr/jastip/backend/uranus/internal/delivery/http"
+	_mongoRepository "github.com/fidellr/jastip/backend/uranus/internal/delivery/repository/mongo"
 
-	"github.com/fidellr/jastip_way/backend/uranus/user"
+	"github.com/fidellr/jastip/backend/uranus/user"
 	"github.com/globalsign/mgo"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"

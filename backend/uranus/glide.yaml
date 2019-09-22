@@ -1,0 +1,11 @@
+package: github.com/fidellr/jastip/backend/uranus
+import:
+- package: github.com/globalsign/mgo
+  subpackages:
+  - bson
+- package: github.com/labstack/echo
+- package: github.com/pkg/errors
+- package: github.com/sirupsen/logrus
+- package: github.com/spf13/cobra
+- package: github.com/spf13/viper
+- package: gopkg.in/go-playground/validator.v9

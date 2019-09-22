@@ -12,12 +12,12 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/fidellr/jastip_way/backend/plateu"
-	"github.com/fidellr/jastip_way/backend/plateu/image"
-	"github.com/fidellr/jastip_way/backend/plateu/utils"
+	"github.com/fidellr/jastip/backend/plateu"
+	"github.com/fidellr/jastip/backend/plateu/image"
+	"github.com/fidellr/jastip/backend/plateu/utils"
 
-	_httpDelivery "github.com/fidellr/jastip_way/backend/plateu/internal/delivery/http"
-	_mongoRepository "github.com/fidellr/jastip_way/backend/plateu/internal/delivery/mongo"
+	_httpDelivery "github.com/fidellr/jastip/backend/plateu/internal/delivery/http"
+	_mongoRepository "github.com/fidellr/jastip/backend/plateu/internal/delivery/mongo"
 )
 
 var plateuServerCMD = &cobra.Command{

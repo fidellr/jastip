@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/fidellr/jastip_way/backend/plateu"
-	"github.com/fidellr/jastip_way/backend/plateu/models"
+	"github.com/fidellr/jastip/backend/plateu"
+	"github.com/fidellr/jastip/backend/plateu/models"
 )
 
 type ImageRepository interface {

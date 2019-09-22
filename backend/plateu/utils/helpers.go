@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/fidellr/jastip_way/backend/plateu/models"
+	"github.com/fidellr/jastip/backend/plateu/models"
 
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"

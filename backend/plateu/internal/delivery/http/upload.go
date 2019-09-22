@@ -11,8 +11,8 @@ import (
 
 	"github.com/labstack/echo"
 
-	"github.com/fidellr/jastip_way/backend/plateu/models"
-	"github.com/fidellr/jastip_way/backend/plateu/utils"
+	"github.com/fidellr/jastip/backend/plateu/models"
+	"github.com/fidellr/jastip/backend/plateu/utils"
 )
 
 func UploadFile(c echo.Context, data interface{}, needs string) (err error) {

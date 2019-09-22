@@ -7,7 +7,7 @@ import (
 
 	"github.com/globalsign/mgo/bson"
 
-	"github.com/fidellr/jastip_way/backend/uranus/models"
+	"github.com/fidellr/jastip/backend/uranus/models"
 )
 
 var (

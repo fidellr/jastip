@@ -9,11 +9,11 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 
-	"github.com/fidellr/jastip_way/backend/plateu/models"
+	"github.com/fidellr/jastip/backend/plateu/models"
 	"github.com/pkg/errors"
 
-	"github.com/fidellr/jastip_way/backend/plateu"
-	"github.com/fidellr/jastip_way/backend/plateu/repository"
+	"github.com/fidellr/jastip/backend/plateu"
+	"github.com/fidellr/jastip/backend/plateu/repository"
 )
 
 type service struct {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/fidellr/jastip_way/backend/plateu/models"
+	"github.com/fidellr/jastip/backend/plateu/models"
 	"github.com/globocom/gothumbor"
 )
 

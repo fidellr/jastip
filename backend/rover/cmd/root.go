@@ -7,5 +7,5 @@ import (
 var RootCMD = &cobra.Command{
 	Use:   "rover",
 	Short: "Rover is a service that handle content management",
-	Long:  "See https://github.com/fidellr/jastip_way/backend/rover for more information",
+	Long:  "See https://github.com/fidellr/jastip/backend/rover for more information",
 }

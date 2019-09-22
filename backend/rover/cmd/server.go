@@ -12,11 +12,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/fidellr/jastip_way/backend/rover"
-	"github.com/fidellr/jastip_way/backend/rover/content"
-	delivery "github.com/fidellr/jastip_way/backend/rover/internal/delivery"
-	_httpDelivery "github.com/fidellr/jastip_way/backend/rover/internal/delivery/http"
-	_mongoRepository "github.com/fidellr/jastip_way/backend/rover/internal/delivery/mongo"
+	"github.com/fidellr/jastip/backend/rover"
+	"github.com/fidellr/jastip/backend/rover/content"
+	delivery "github.com/fidellr/jastip/backend/rover/internal/delivery"
+	_httpDelivery "github.com/fidellr/jastip/backend/rover/internal/delivery/http"
+	_mongoRepository "github.com/fidellr/jastip/backend/rover/internal/delivery/mongo"
 )
 
 var roverServerCMD = &cobra.Command{

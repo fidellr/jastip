@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"time"
 
-	"github.com/fidellr/jastip_way/backend/rover/models"
+	"github.com/fidellr/jastip/backend/rover/models"
 	"github.com/globalsign/mgo/bson"
 )
 

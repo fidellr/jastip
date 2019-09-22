@@ -4,10 +4,10 @@ import (
 	"context"
 	"log"
 
-	"github.com/fidellr/jastip_way/backend/uranus/repository"
+	"github.com/fidellr/jastip/backend/uranus/repository"
 
-	"github.com/fidellr/jastip_way/backend/uranus"
-	"github.com/fidellr/jastip_way/backend/uranus/models"
+	"github.com/fidellr/jastip/backend/uranus"
+	"github.com/fidellr/jastip/backend/uranus/models"
 
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"

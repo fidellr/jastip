@@ -1,0 +1,24 @@
+package: github.com/fidellr/jastip/backend/plateu
+import:
+- package: github.com/PuerkitoBio/goquery
+- package: github.com/fidellr/jastip
+  subpackages:
+  - backend/plateu
+  - backend/plateu/cmd
+  - backend/plateu/image
+  - backend/plateu/internal/delivery/http
+  - backend/plateu/internal/delivery/mongo
+  - backend/plateu/models
+  - backend/plateu/repository
+  - backend/plateu/utils
+  - backend/uranus/models
+- package: github.com/globalsign/mgo
+  subpackages:
+  - bson
+- package: github.com/globocom/gothumbor
+- package: github.com/labstack/echo
+- package: github.com/pkg/errors
+- package: github.com/sirupsen/logrus
+- package: github.com/spf13/cobra
+- package: github.com/spf13/viper
+- package: gopkg.in/go-playground/validator.v9

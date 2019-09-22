@@ -18,7 +18,7 @@ package main
 import (
 	"log"
 
-	"github.com/fidellr/jastip_way/backend/plateu/cmd"
+	"github.com/fidellr/jastip/backend/plateu/cmd"
 )
 
 func main() {

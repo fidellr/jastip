@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 
-	"github.com/fidellr/jastip_way/backend/uranus"
+	"github.com/fidellr/jastip/backend/uranus"
 
-	"github.com/fidellr/jastip_way/backend/uranus/models"
+	"github.com/fidellr/jastip/backend/uranus/models"
 )
 
 // UserAccountRepository repo

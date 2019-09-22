@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/fidellr/jastip_way/backend/uranus/cmd"
+	"github.com/fidellr/jastip/backend/uranus/cmd"
 	"github.com/sirupsen/logrus"
 )
 

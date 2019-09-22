@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/fidellr/jastip_way/backend/uranus/models"
+	"github.com/fidellr/jastip/backend/uranus/models"
 	"github.com/globalsign/mgo/bson"
 )
 

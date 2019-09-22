@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/sirupsen/logrus"
 
-	"github.com/fidellr/jastip_way/backend/rover/cmd"
+	"github.com/fidellr/jastip/backend/rover/cmd"
 )
 
 func main() {

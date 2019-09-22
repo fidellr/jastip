@@ -7,5 +7,5 @@ import (
 var RootCMD = &cobra.Command{
 	Use:   "plateu",
 	Short: "Plateu is a service that handle picture compressing or thumbor",
-	Long:  "See https://github.com/fidellr/jastip_way/backend/plateu for more information",
+	Long:  "See https://github.com/fidellr/jastip/backend/plateu for more information",
 }
