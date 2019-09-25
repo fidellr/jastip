@@ -45,7 +45,7 @@ func NewService(reqs ...requirement) rover.ContentUsecase {
 	return s
 }
 
-func (s *service) CreateScreenContent(ctx context.Context, m *models.Content) (err error) {
+func (s *service) CreateScreenContent(ctx context.Context, m *models.Screen) (err error) {
 	if ctx == nil {
 		err = rover.ErrContextNil
 	}
@@ -73,7 +73,7 @@ func (s *service) CreateScreenContent(ctx context.Context, m *models.Content) (e
 	return nil
 }
 
-func (s *service) FetchContent(ctx context.Context, filter *rover.Filter) ([]*models.Content, string, error) {
+func (s *service) FetchContent(ctx context.Context, filter *rover.Filter) ([]*models.Screen, string, error) {
 	if ctx == nil {
 		err := rover.ErrContextNil
 		return nil, "", err
@@ -95,7 +95,7 @@ func (s *service) FetchContent(ctx context.Context, filter *rover.Filter) ([]*mo
 
 }
 
-func (s *service) GetContentByScreen(ctx context.Context, screenName string) (content *models.Content, err error) {
+func (s *service) GetContentByScreen(ctx context.Context, screenName string) (content *models.Screen, err error) {
 	if ctx == nil {
 		err = rover.ErrContextNil
 		return nil, err
@@ -112,7 +112,7 @@ func (s *service) GetContentByScreen(ctx context.Context, screenName string) (co
 	return content, nil
 }
 
-func (s *service) UpdateByContentID(ctx context.Context, screenID string, m *models.Content) (err error) {
+func (s *service) UpdateByContentID(ctx context.Context, screenID string, m *models.Screen) (err error) {
 	if ctx == nil {
 		err = rover.ErrContextNil
 		return err

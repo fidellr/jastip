@@ -8,6 +8,6 @@ import (
 
 func main() {
 	if err := cmd.RootCMD.Execute(); err != nil {
-		logrus.Fatalf("Fail init content Root CMD with error : %s", err.Error())
+		logrus.Printf("Fail init content Root CMD with error : %s", err.Error())
 	}
 }

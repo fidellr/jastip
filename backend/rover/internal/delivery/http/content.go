@@ -41,7 +41,7 @@ func (h *contentHandler) CreateScreenContent(c echo.Context) (err error) {
 		ctx = context.Background()
 	}
 
-	content := new(models.Content)
+	content := new(models.Screen)
 	if err = c.Bind(content); err != nil {
 		return rover.ConstraintErrorf("%s", err.Error())
 	}
@@ -89,7 +89,7 @@ func (h *contentHandler) GetScreenContent(c echo.Context) (err error) {
 		ctx = context.Background()
 	}
 
-	content := new(models.Content)
+	content := new(models.Screen)
 	content, err = h.service.GetContentByScreen(ctx, c.Param("screen_name"))
 	if err != nil {
 		return rover.ConstraintErrorf("%s", err.Error())
@@ -105,7 +105,7 @@ func (h *contentHandler) UpdateByContentID(c echo.Context) (err error) {
 	}
 
 	contentID := c.Param("content_id")
-	content := new(models.Content)
+	content := new(models.Screen)
 	if err = c.Bind(content); err != nil {
 		return rover.ConstraintErrorf("%s", err.Error())
 	}
